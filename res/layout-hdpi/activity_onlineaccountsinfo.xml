@@ -12,7 +12,7 @@
             android:id="@+id/topbarLayout"
             android:layout_width="fill_parent"
             android:layout_height="50dip"
-            android:background="@drawable/nav_bar_bg"
+            android:background="@drawable/navbar_bg"
             android:orientation="horizontal" >
 
             <Button
@@ -21,7 +21,9 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="15dip"
-                android:background="@drawable/btn_back" />
+                android:background="@drawable/navbar_btn3_normal"
+                android:text="  返回"
+                android:textColor="@color/white" />
 
             <TextView
                 style="@style/white_20"

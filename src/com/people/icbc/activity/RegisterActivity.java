@@ -13,6 +13,7 @@ import com.people.network.LKHttpRequestQueueDone;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -22,7 +23,7 @@ public class RegisterActivity extends BaseActivity implements OnClickListener {
 	private Button btn_back, btn_confirm = null;
 
 	private EditText usernameEdit = null;
-	private EditText passwordEdit = null;
+	private EditText passwordEdit, passwordEdit2 = null;
 	private String szImei = null;
 
 	@Override
@@ -41,6 +42,7 @@ public class RegisterActivity extends BaseActivity implements OnClickListener {
 		btn_confirm = (Button) findViewById(R.id.btn_confirm);
 		usernameEdit = (EditText) findViewById(R.id.et_username);
 		passwordEdit = (EditText) findViewById(R.id.et_pwd);
+		passwordEdit2 = (EditText) findViewById(R.id.et_pwd2);
 	}
 
 	public void setview() {
@@ -55,7 +57,20 @@ public class RegisterActivity extends BaseActivity implements OnClickListener {
 			finish();
 			break;
 		case R.id.btn_confirm:
-			register();
+
+			if (passwordEdit.getText().toString().length() == 0) {
+				showToast("密码不能为空");
+			} else if (isMobileNO(usernameEdit.getText().toString())) {
+				if (passwordEdit.getText().toString().trim()
+						.equals(passwordEdit2.getText().toString().trim())) {
+					register();
+				} else {
+					showToast("两次密码不符请重新输入");
+				}
+			} else {
+				showToast("请输入手机号作为用户名");
+
+			}
 			break;
 		default:
 			break;
@@ -119,4 +134,12 @@ public class RegisterActivity extends BaseActivity implements OnClickListener {
 		alertDialog.create().show();
 	}
 
+	public static boolean isMobileNO(String mobiles) {
+
+		String telRegex = "[1][358]\\d{9}";// "[1]"代表第1位为数字1，"[358]"代表第二位可以为3、5、8中的一个，"\\d{9}"代表后面是可以是0～9的数字，有9位。
+		if (TextUtils.isEmpty(mobiles))
+			return false;
+		else
+			return mobiles.matches(telRegex);
+	}
 }

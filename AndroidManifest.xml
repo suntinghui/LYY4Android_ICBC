@@ -80,6 +80,13 @@
         <activity android:name="com.people.icbc.activity.DefeatedActivity" >
         </activity>
         <activity
+            android:name="com.people.icbc.activity.FacePayActivity"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="com.people.icbc.activity.FacePayActivity" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="com.people.icbc.activity.BothAccountsInfoActivity"
             android:launchMode="singleTask" >
             <intent-filter>
@@ -92,6 +99,10 @@
             <intent-filter>
                 <action android:name="com.people.ConfirmOrderActivity" />
             </intent-filter>
+        </activity>
+        <activity android:name=".activity.HomepageActivity" >
+        </activity>
+        <activity android:name=".activity.ICBCMainActivity" >
         </activity>
 
         <service

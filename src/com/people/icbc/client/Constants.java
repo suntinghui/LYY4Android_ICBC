@@ -27,6 +27,7 @@ public class Constants {
 
 	public static boolean GENTOKEN_ONLINE = true;
 	public static boolean SHOP_ONLINE = true;
+	public static boolean FACE_PAY = true;
 
 	public static final int OVERTIME = 20;// 超时时间
 
@@ -40,7 +41,7 @@ public class Constants {
 
 	public static String URL;
 	public static String VERSION2 = "";
-	
+
 	public static String resultCode;
 	public static String resultBalance;
 

@@ -252,6 +252,7 @@ public class AccountsInfoActivity extends BaseActivity implements
 								timer.schedule(task, 1000, 1000);
 
 								Constants.GENTOKEN_ONLINE = false;
+								Constants.FACE_PAY = false;
 								Constants.SHOP_ONLINE = false;
 								AccountsInfoActivity.this
 										.showDialog(

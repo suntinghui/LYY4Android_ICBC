@@ -319,6 +319,7 @@ public class OnlineAccountsInfoActivity extends BaseActivity implements
 		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 				long arg3) {
 
+			Constants.SHOP_ONLINE = false;
 			Constants.GENTOKEN_ONLINE = true;
 
 			adapter.setSelectItem(arg2);

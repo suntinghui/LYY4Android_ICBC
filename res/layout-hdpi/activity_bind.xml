@@ -8,7 +8,7 @@
         android:id="@+id/topbarLayout"
         android:layout_width="fill_parent"
         android:layout_height="50dip"
-        android:background="@drawable/nav_bar_bg"
+        android:background="@drawable/navbar_bg"
         android:orientation="horizontal" >
 
         <Button
@@ -17,14 +17,16 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dip"
-            android:background="@drawable/btn_back" />
+            android:background="@drawable/navbar_btn3_normal"
+            android:text="  返回"
+            android:textColor="@color/white" />
 
         <TextView
             style="@style/white_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/bind_card" />
+            android:text="绑定虚拟卡" />
     </RelativeLayout>
 
     <View
@@ -123,16 +125,16 @@
             android:layout_marginTop="12dip"
             android:background="@color/gray" />
     </LinearLayout>
-<Button
-            android:id="@+id/btn_confirm"
-            style="@style/white_20"
-            android:layout_width="fill_parent"
-            android:layout_height="45dp"
-            android:layout_marginLeft="15dip"
-            android:layout_marginRight="15dip"
-            android:layout_marginTop="20dip"
-            android:background="@drawable/btn"
-            android:text="@string/ok" />
-    
+
+    <Button
+        android:id="@+id/btn_confirm"
+        style="@style/white_20"
+        android:layout_width="fill_parent"
+        android:layout_height="45dp"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="15dip"
+        android:layout_marginTop="20dip"
+        android:background="@drawable/btn"
+        android:text="@string/ok" />
 
 </LinearLayout>

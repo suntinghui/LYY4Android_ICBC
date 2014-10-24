@@ -57,7 +57,6 @@ public class ConfirmOrderActivity extends BaseActivity implements
 
 	private void initView() {
 		tv_time = (TextView) findViewById(R.id.tv_time);
-		Toast.makeText(getApplication(), "???", Toast.LENGTH_SHORT).show();
 		tv_time.setText("交易日期:" + Constants.resultString.substring(0, 8));
 		tv_shopcode = (TextView) findViewById(R.id.tv_shopcode);
 		tv_shopcode.setText("商户：" + Constants.resultString.substring(8, 21));

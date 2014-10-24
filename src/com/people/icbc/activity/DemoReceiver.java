@@ -30,6 +30,12 @@ public class DemoReceiver extends BroadcastReceiver {
 				intent0.putExtra("token", intent.getStringExtra("key").trim());
 				intent0.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				context.startActivity(intent0);
+			} else if (Constants.FACE_PAY) {
+				Log.e("FACEPAY", intent.getStringExtra("key").trim());
+				Intent intent1 = new Intent(context, FacePayActivity.class);
+				intent1.putExtra("token", intent.getStringExtra("key").trim());
+				intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				context.startActivity(intent1);
 			} else {
 				Log.e("SOTPOFFLINE", intent.getStringExtra("key").trim());
 				Intent intent1 = new Intent(context, AccountsInfoActivity.class);

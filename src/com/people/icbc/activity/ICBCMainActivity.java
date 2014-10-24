@@ -69,7 +69,9 @@ public class ICBCMainActivity extends BaseActivity implements OnClickListener {
 							OnlineShopActivity.class);
 					startActivity(intent0);
 				} else if (position == 1) {
-					showToast("当面付");
+					Intent intent1 = new Intent(ICBCMainActivity.this,
+							FacePayActivity.class);
+					startActivity(intent1);
 				} else if (position == 2) {
 					Intent intent2 = new Intent(ICBCMainActivity.this,
 							OnlineAccountsInfoActivity.class);
@@ -79,7 +81,9 @@ public class ICBCMainActivity extends BaseActivity implements OnClickListener {
 							AccountsInfoActivity.class);
 					startActivity(intent3);
 				} else if (position == 4) {
-					showToast("扫描二维码消费");
+					Intent intent0 = new Intent(ICBCMainActivity.this,
+							OnlineShopActivity.class);
+					startActivity(intent0);
 				} else if (position == 5) {
 					Intent intent5 = new Intent(ICBCMainActivity.this,
 							BindActivity.class);
