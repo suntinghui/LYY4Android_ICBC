@@ -32,9 +32,23 @@ public class ParseResponseXML {
 			case TransferRequestTag.Generate: // 在线消费
 				return parseResponse(responseStr);
 
-			case TransferRequestTag.OnlineShop: // 在线消费
+			case TransferRequestTag.OnlineShop: // 在线商城
 				return onLineShop(responseStr);
 
+			case TransferRequestTag.Verify: // 在线商城验证
+				Log.e("responseStr", responseStr);
+				return parseResponse(responseStr);
+
+			case TransferRequestTag.FacePayVerify: // 在线商城验证
+				Log.e("responseStr2", responseStr);
+				return parseResponse(responseStr);
+
+			case TransferRequestTag.Transfer: // 在线商城验证
+				Log.e("responseStr3", responseStr);
+				if (responseStr.contains("&")) {
+					Constants.FACERECEIVE_CADE = responseStr.split("&")[1];
+				}
+				return parseResponse(responseStr);
 			}
 
 		} catch (Exception e) {

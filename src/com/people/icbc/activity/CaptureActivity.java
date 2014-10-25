@@ -15,6 +15,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
@@ -27,8 +28,10 @@ import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
+import com.people.icbc.client.ApplicationEnvironment;
 import com.people.icbc.client.Constants;
 import com.people.icbc.client.TransferRequestTag;
+import com.people.icbc.model.AccountInfo;
 import com.people.icbc.zxing.CameraManager;
 import com.people.icbc.zxing.CaptureActivityHandler;
 import com.people.icbc.zxing.InactivityTimer;
@@ -59,7 +62,7 @@ public class CaptureActivity extends BaseActivity implements Callback {
 	private boolean vibrate;
 	private Button btn_light_control, btn_back;
 	private boolean isShow = false;
-
+	private String result0;
 	private ProgressBar pg;
 	private ImageView iv_pg_bg_grey;
 
@@ -153,8 +156,9 @@ public class CaptureActivity extends BaseActivity implements Callback {
 	public void handleDecode(Result result, Bitmap barcode) {
 		inactivityTimer.onActivity();
 		playBeepSoundAndVibrate();
+		result0 = result.getText();
 		Constants.resultString = result.getText().split("=")[1];
-
+		Log.e("resultString", Constants.resultString);
 		if (Constants.resultString.equals("")) {
 			Toast.makeText(CaptureActivity.this, "Scan failed!",
 					Toast.LENGTH_SHORT).show();
@@ -163,11 +167,117 @@ public class CaptureActivity extends BaseActivity implements Callback {
 				pg.setVisibility(View.GONE);
 				iv_pg_bg_grey.setVisibility(View.VISIBLE);
 			}
-			Intent intent = new Intent(CaptureActivity.this,
-					ConfirmOrderActivity.class);
-			startActivity(intent);
-			finish();
+			Intent intent = getIntent();
+			String s = intent.getStringExtra("test");
+			if (s.equals("test")) {
+				Verify();
+			} else {
+				FacePayVerify();
+			}
 		}
+	}
+
+	private void FacePayVerify() {
+		HashMap<String, Object> tempMap = new HashMap<String, Object>();
+		tempMap.put("token", Constants.resultString);
+
+		LKHttpRequest req1 = new LKHttpRequest(
+				TransferRequestTag.FacePayVerify, tempMap,
+				FacePayVerifyHandler());
+
+		new LKHttpRequestQueue().addHttpRequest(req1).executeQueue(
+				"正在加载数据请稍候。。。", new LKHttpRequestQueueDone() {
+					@Override
+					public void onComplete() {
+						super.onComplete();
+						BaseActivity.getTopActivity().hideDialog(
+								ADPROGRESS_DIALOG);
+						finish();
+					}
+
+				});
+
+	}
+
+	public LKAsyncHttpResponseHandler FacePayVerifyHandler() {
+
+		return new LKAsyncHttpResponseHandler() {
+			@Override
+			public void successAction(Object obj) {
+				HashMap<String, String> map = (HashMap<String, String>) obj;
+				String rt = map.get("ret");
+				switch (Integer.parseInt(rt)) {
+				case 0:
+
+					Intent intent0 = new Intent(CaptureActivity.this,
+							TransferActivity.class);
+					startActivityForResult(intent0, 102);
+					break;
+				case 16:
+					Intent intent1 = new Intent(CaptureActivity.this,
+							DefeatedActivity.class);
+					intent1.putExtra("result", "银行卡验证失败");
+					startActivityForResult(intent1, 100);
+					break;
+
+				default:
+					showToast("未知错误");
+					break;
+				}
+			}
+		};
+
+	}
+
+	private void Verify() {
+		HashMap<String, Object> tempMap = new HashMap<String, Object>();
+		tempMap.put("token", Constants.resultString);
+
+		LKHttpRequest req1 = new LKHttpRequest(TransferRequestTag.Verify,
+				tempMap, VerifyHandler());
+
+		new LKHttpRequestQueue().addHttpRequest(req1).executeQueue(
+				"正在加载数据请稍候。。。", new LKHttpRequestQueueDone() {
+					@Override
+					public void onComplete() {
+						super.onComplete();
+						BaseActivity.getTopActivity().hideDialog(
+								ADPROGRESS_DIALOG);
+						finish();
+					}
+
+				});
+
+	}
+
+	public LKAsyncHttpResponseHandler VerifyHandler() {
+
+		return new LKAsyncHttpResponseHandler() {
+			@Override
+			public void successAction(Object obj) {
+				HashMap<String, String> map = (HashMap<String, String>) obj;
+				String rt = map.get("ret");
+				switch (Integer.parseInt(rt)) {
+				case 0:
+
+					Intent intent0 = new Intent(CaptureActivity.this,
+							ConfirmOrderActivity.class);
+					startActivityForResult(intent0, 102);
+					break;
+				case 16:
+					Intent intent1 = new Intent(CaptureActivity.this,
+							DefeatedActivity.class);
+					intent1.putExtra("result", "银行卡验证失败");
+					startActivityForResult(intent1, 100);
+					break;
+
+				default:
+					showToast("未知错误");
+					break;
+				}
+			}
+		};
+
 	}
 
 	private void initCamera(SurfaceHolder surfaceHolder) {
@@ -263,4 +373,9 @@ public class CaptureActivity extends BaseActivity implements Callback {
 		}
 	};
 
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			finish();
+		}
+	};
 }

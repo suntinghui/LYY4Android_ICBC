@@ -13,6 +13,9 @@ public class TransferRequestTag {
 
 	public static final int getAccountStr = 4;
 	public static final int OnlineShop = 5;// 网上商城
+	public static final int Verify = 6;// 网上商城验证
+	public static final int FacePayVerify = 7;// 网上商城验证
+	public static final int Transfer = 8;// 转账
 
 	private static HashMap<Integer, String> requestTagMap = null;
 
@@ -28,6 +31,10 @@ public class TransferRequestTag {
 			requestTagMap.put(getAccountStr, Constants.IP + "/list");
 			requestTagMap.put(Generate, Constants.IP + "/Generate/");
 			requestTagMap.put(OnlineShop, Constants.IP + "/online/");
+			requestTagMap.put(Verify, Constants.IP + "/checkER");
+			requestTagMap.put(FacePayVerify, Constants.IP + "/checkcode");
+			requestTagMap.put(Transfer, Constants.IP + "/transfer");
+
 		}
 
 		return requestTagMap;

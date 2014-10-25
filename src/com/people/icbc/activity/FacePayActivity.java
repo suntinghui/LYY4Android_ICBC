@@ -57,7 +57,7 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 	private LinearLayout lay_consume2, lay_bigtwo, lay_bigone = null;
 	private ImageView iv_consume, iv_consume2, iv_bigone, iv_bigtwo = null;
 	private boolean codeShow = false;
-	private Button btn_back, btn_confirm = null;
+	private Button btn_back, btn_receive, btn_pay = null;
 	private ListView lv_balance = null;
 	private List<AccountInfo> list_balance = null;
 	private MyAdapter adapter = null;
@@ -70,6 +70,7 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 	public static boolean isShow = false;
 	public static String code = null;
 	public boolean toast = true;
+	private String cardCode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -125,11 +126,16 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 
 		btn_back = (Button) findViewById(R.id.btn_back);
 		btn_back.setOnClickListener(this);
-		btn_confirm = (Button) findViewById(R.id.btn_confirm);
-		btn_confirm.setOnClickListener(this);
-		btn_confirm.setClickable(false);
-		btn_confirm.setFocusable(false);
-		btn_confirm.setBackgroundColor(Color.GRAY);
+		btn_receive = (Button) findViewById(R.id.btn_receive);
+		btn_receive.setOnClickListener(this);
+		btn_receive.setClickable(false);
+		btn_receive.setFocusable(false);
+		btn_receive.setBackgroundColor(Color.GRAY);
+		btn_pay = (Button) findViewById(R.id.btn_pay);
+		btn_pay.setOnClickListener(this);
+		btn_pay.setClickable(false);
+		btn_pay.setFocusable(false);
+		btn_pay.setBackgroundColor(Color.GRAY);
 
 		list_balance = new ArrayList<AccountInfo>();
 
@@ -175,7 +181,6 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 		Intent serviceIntent = new Intent("com.people.sotp.lyyservice");
 		serviceIntent.putExtra("SOTP", "genTOKEN");
 		serviceIntent.putExtra("key", tempStr);
-		Log.e("开启服务", "这里走了");
 		startService(serviceIntent);
 	}
 
@@ -209,71 +214,75 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 		case R.id.btn_back:
 			finish();
 			break;
+		case R.id.btn_pay:
+			Intent intent = new Intent(FacePayActivity.this,
+					CaptureActivity.class);
+			intent.putExtra("test", "facepay");
+			startActivity(intent);
+			break;
+		case R.id.btn_receive:
+			// AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+			// View view2 = LayoutInflater.from(FacePayActivity.this).inflate(
+			// R.layout.dialog_psw, null);
+			//
+			// final EditText editText_pwd = (EditText) view2
+			// .findViewById(R.id.password);
+			// dialog.setView(view2);
+			// dialog.setPositiveButton("确定",
+			// new DialogInterface.OnClickListener() {
+			//
+			// @Override
+			// public void onClick(DialogInterface dialog, int which) {
+			// String password = editText_pwd.getText().toString()
+			// .trim();
+			// if (password.equals(ApplicationEnvironment
+			// .getInstance().getPreferences()
+			// .getString(Constants.kPASSWORD, ""))) {
+			timer = new Timer();
+			task = new TimerTask() {
+				@Override
+				public void run() {
 
-		case R.id.btn_confirm:
-			AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-			View view2 = LayoutInflater.from(FacePayActivity.this).inflate(
-					R.layout.dialog_psw, null);
-
-			final EditText editText_pwd = (EditText) view2
-					.findViewById(R.id.password);
-			dialog.setView(view2);
-			dialog.setPositiveButton("确定",
-					new DialogInterface.OnClickListener() {
-
+					runOnUiThread(new Runnable() { // UI
+						// thread
 						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							String password = editText_pwd.getText().toString()
-									.trim();
-							if (password.equals(ApplicationEnvironment
-									.getInstance().getPreferences()
-									.getString(Constants.kPASSWORD, ""))) {
-								timer = new Timer();
-								task = new TimerTask() {
-									@Override
-									public void run() {
-
-										runOnUiThread(new Runnable() { // UI
-											// thread
-											@Override
-											public void run() {
-												count--;
-												tv_time.setText("距离刷新还有"
-														+ count + "秒");
-												if (count == 0) {
-													resetData();
-													count = 60;
-												}
-											}
-										});
-									}
-								};
-								timer.schedule(task, 1000, 1000);
-
-								Constants.GENTOKEN_ONLINE = false;
-								Constants.SHOP_ONLINE = false;
-								FacePayActivity.this
-										.showDialog(
-												BaseActivity.PROGRESS_DIALOG,
-												"正在加密请稍候");
+						public void run() {
+							count--;
+							tv_time.setText("距离刷新还有" + count + "秒");
+							if (count == 0) {
 								resetData();
-							} else {
-								showToast("密码错误请重新输入");
+								count = 60;
 							}
 						}
 					});
-			dialog.setNegativeButton("取消",
-					new DialogInterface.OnClickListener() {
+				}
+			};
+			timer.schedule(task, 1000, 1000);
 
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
+			Constants.GENTOKEN_ONLINE = false;
+			Constants.SHOP_ONLINE = false;
 
-						}
+			FacePayActivity.this.showDialog(BaseActivity.PROGRESS_DIALOG,
+					"正在加密请稍候");
+			resetData();
 
-					});
-			dialog.create();
-			dialog.show();
+			// } else {
+			// showToast("密码错误请重新输入");
+			// }
+			// }
+			// });
+			// dialog.setNegativeButton("取消",
+			// new DialogInterface.OnClickListener() {
+			//
+			// @Override
+			// public void onClick(DialogInterface dialog, int which) {
+			// dialog.dismiss();
+			//
+			// }
+			//
+			// });
+			// dialog.create();
+			// dialog.show();
 
 			break;
 		case R.id.iv_consume:
@@ -361,12 +370,15 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 			Constants.GENTOKEN_ONLINE = false;
 			Constants.SHOP_ONLINE = false;
 			Constants.FACE_PAY = true;
-
+			Constants.FACEPAY_CARD = cardCode;
 			adapter.setSelectItem(arg2);
 			adapter.notifyDataSetChanged();
-			btn_confirm.setClickable(true);
-			btn_confirm.setFocusable(true);
-			btn_confirm.setBackgroundResource(R.drawable.btn);
+			btn_receive.setClickable(true);
+			btn_receive.setFocusable(true);
+			btn_receive.setBackgroundResource(R.drawable.btn);
+			btn_pay.setClickable(true);
+			btn_pay.setFocusable(true);
+			btn_pay.setBackgroundResource(R.drawable.btn);
 			tv_can_cost.setText(list_balance.get(arg2).getCan_cost() + "元");
 
 		}
@@ -411,7 +423,7 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 			} else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-			String cardCode = list_balance.get(position).getBalance();
+			cardCode = list_balance.get(position).getBalance();
 			holder.tv_cardcode.setText("(尾号)"
 					+ cardCode.substring(cardCode.length() - 6,
 							cardCode.length()));
