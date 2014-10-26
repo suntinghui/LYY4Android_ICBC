@@ -152,6 +152,7 @@ public class ConfirmOrderActivity extends BaseActivity implements
 					Constants.resultBalance = resultMap.get("money");
 					Intent resultIntent = new Intent(ConfirmOrderActivity.this,
 							SuccessActivity.class);
+					resultIntent.putExtra("FROM", "ConfirmOrder");
 					startActivityForResult(resultIntent, 100);
 
 				} else {

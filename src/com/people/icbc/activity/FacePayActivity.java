@@ -71,6 +71,8 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 	public static String code = null;
 	public boolean toast = true;
 	private String cardCode;
+	private TextView tv_blanceChange;
+	private boolean firstClick = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 		initView();
 
 		initData();
+
 	}
 
 	protected void onNewIntent(Intent i) {
@@ -153,6 +156,7 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 	}
 
 	public void initData() {
+
 		String tempStr = ApplicationEnvironment.getInstance().getPreferences()
 				.getString(Constants.kACCOUNTLIST, "");
 		list_balance = ParseResponseXML.accounts(tempStr);
@@ -162,7 +166,6 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 			total_cash = total_cash
 					+ Integer.parseInt(list_balance.get(i).getCan_cost());
 		}
-
 		tv_balance.setText(total_cash + "元");
 	}
 
@@ -218,7 +221,7 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 			Intent intent = new Intent(FacePayActivity.this,
 					CaptureActivity.class);
 			intent.putExtra("test", "facepay");
-			startActivity(intent);
+			startActivityForResult(intent, 100);
 			break;
 		case R.id.btn_receive:
 			// AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -380,7 +383,7 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 			btn_pay.setFocusable(true);
 			btn_pay.setBackgroundResource(R.drawable.btn);
 			tv_can_cost.setText(list_balance.get(arg2).getCan_cost() + "元");
-
+			tv_blanceChange = (TextView) arg1.findViewById(R.id.tv_cardbalance);
 		}
 
 	};
@@ -427,10 +430,14 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 			holder.tv_cardcode.setText("(尾号)"
 					+ cardCode.substring(cardCode.length() - 6,
 							cardCode.length()));
-			holder.tv_cardbalance.getPaint().setFlags(
-					Paint.STRIKE_THRU_TEXT_FLAG);
-			holder.tv_cardbalance.setText(list_balance.get(position)
-					.getCan_cost());
+//			holder.tv_cardbalance.getPaint().setFlags(
+//					Paint.STRIKE_THRU_TEXT_FLAG);
+			if (firstClick) {
+				holder.tv_cardbalance.setText(list_balance.get(position)
+						.getCan_cost());
+				firstClick = false;
+			}
+			Constants.FACE_SUM = list_balance.get(position).getCan_cost();
 
 			if (position == selectItem) {
 				holder.imageView.setBackgroundResource(R.drawable.remeberpwd_s);
@@ -479,4 +486,9 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 		return bitmap;
 	}
 
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK) {
+			tv_blanceChange.setText(Constants.FACE_SUM2);
+		}
+	};
 }

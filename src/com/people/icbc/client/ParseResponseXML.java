@@ -21,6 +21,7 @@ public class ParseResponseXML {
 				return parseResponse(responseStr);
 
 			case TransferRequestTag.Login: // 登录
+				Log.e("responseStr",responseStr);
 				return parseResponse(responseStr);
 
 			case TransferRequestTag.Accounts: // 离线消费
@@ -36,18 +37,16 @@ public class ParseResponseXML {
 				return onLineShop(responseStr);
 
 			case TransferRequestTag.Verify: // 在线商城验证
-				Log.e("responseStr", responseStr);
 				return parseResponse(responseStr);
 
 			case TransferRequestTag.FacePayVerify: // 在线商城验证
-				Log.e("responseStr2", responseStr);
-				return parseResponse(responseStr);
-
-			case TransferRequestTag.Transfer: // 在线商城验证
-				Log.e("responseStr3", responseStr);
+				Log.e("????", responseStr);
 				if (responseStr.contains("&")) {
 					Constants.FACERECEIVE_CADE = responseStr.split("&")[1];
 				}
+				return parseResponse(responseStr);
+
+			case TransferRequestTag.Transfer: // 当面付款方
 				return parseResponse(responseStr);
 			}
 
@@ -115,14 +114,5 @@ public class ParseResponseXML {
 
 		return map;
 	}
-
-	// private static List<String> onLineShop2(String str) {
-	// String[] ss = str.split("=");
-	// List<String> list = new ArrayList<String>();
-	// list.add(ss[1].substring(0, 8));
-	// list.add(ss[1].substring(8, 21));
-	// list.add(ss[1].substring(21, 28));
-	// return list;
-	// }
 
 }

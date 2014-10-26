@@ -157,8 +157,12 @@ public class CaptureActivity extends BaseActivity implements Callback {
 		inactivityTimer.onActivity();
 		playBeepSoundAndVibrate();
 		result0 = result.getText();
-		Constants.resultString = result.getText().split("=")[1];
-		Log.e("resultString", Constants.resultString);
+		// 判断是网上商城调用还是当面付调用
+		if (result.getText().toString().contains("=")) {
+			Constants.resultString = result.getText().toString().split("=")[1];
+		} else {
+			Constants.resultString = result.getText().toString();
+		}
 		if (Constants.resultString.equals("")) {
 			Toast.makeText(CaptureActivity.this, "Scan failed!",
 					Toast.LENGTH_SHORT).show();
@@ -192,7 +196,7 @@ public class CaptureActivity extends BaseActivity implements Callback {
 						super.onComplete();
 						BaseActivity.getTopActivity().hideDialog(
 								ADPROGRESS_DIALOG);
-						finish();
+
 					}
 
 				});
@@ -208,7 +212,6 @@ public class CaptureActivity extends BaseActivity implements Callback {
 				String rt = map.get("ret");
 				switch (Integer.parseInt(rt)) {
 				case 0:
-
 					Intent intent0 = new Intent(CaptureActivity.this,
 							TransferActivity.class);
 					startActivityForResult(intent0, 102);
@@ -218,6 +221,9 @@ public class CaptureActivity extends BaseActivity implements Callback {
 							DefeatedActivity.class);
 					intent1.putExtra("result", "银行卡验证失败");
 					startActivityForResult(intent1, 100);
+					break;
+				case 10:
+					showToast("用户不存在");
 					break;
 
 				default:
@@ -259,7 +265,6 @@ public class CaptureActivity extends BaseActivity implements Callback {
 				String rt = map.get("ret");
 				switch (Integer.parseInt(rt)) {
 				case 0:
-
 					Intent intent0 = new Intent(CaptureActivity.this,
 							ConfirmOrderActivity.class);
 					startActivityForResult(intent0, 102);
@@ -375,6 +380,7 @@ public class CaptureActivity extends BaseActivity implements Callback {
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
+			setResult(RESULT_OK);
 			finish();
 		}
 	};

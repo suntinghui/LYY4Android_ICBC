@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
+	private ImageView logoImageView = null;
 	private EditText usernameEdit = null;
 	private EditText passwordEdit = null;
 	private Button btn_login, btn_register = null;
@@ -66,7 +68,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			if (checkValue()) {
 				login();
 			}
-
 			break;
 		case R.id.btn_register:
 			Intent intent = new Intent(LoginActivity.this,
@@ -142,13 +143,13 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 							&& ActivityUtil.isAvilible(LoginActivity.this,
 									Constants.SOTPPACKET)) {
 						Intent intent = new Intent(LoginActivity.this,
-								ICBCMainActivity.class);
+								LockScreenSettingActivity.class);
 						LoginActivity.this.startActivity(intent);
 
 					} else {
 
 						downloadAPKURL = Constants.IP + url;
-
+						Constants.URL = downloadAPKURL;
 						new DownloadAPKTask().execute();
 
 						Editor editor = ApplicationEnvironment.getInstance()
@@ -158,10 +159,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 						editor.commit();
 
 						Intent intent = new Intent(LoginActivity.this,
-								ICBCMainActivity.class);
+								LockScreenSettingActivity.class);
 						LoginActivity.this.startActivity(intent);
 					}
-					LoginActivity.this.finish();
 
 				} else if (rt.equals("1")) { // 参数不合法
 					LoginActivity.this.showDialog(BaseActivity.MODAL_DIALOG,
@@ -207,10 +207,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		return new LKAsyncHttpResponseHandler() {
 			@Override
 			public void successAction(Object obj) {
-				if (!ActivityUtil.isAvilible(BaseActivity.getTopActivity(),
-						Constants.SOTPPACKET)) {
-					new DownloadAPKTask().execute();
-				}
+				// new DownloadAPKTask().execute();
+
 				Editor editor = ApplicationEnvironment.getInstance()
 						.getPreferences().edit();
 				editor.putString(Constants.kACCOUNTLIST, (String) obj);
@@ -241,5 +239,222 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		DownloadFileRequest.sharedInstance().downloadAndOpen(this,
 				downloadAPKURL, "download.apk");
 	}
+	// private EditText usernameEdit = null;
+	// private EditText passwordEdit = null;
+	// private Button btn_login, btn_register = null;
+	//
+	// private String downloadAPKURL;
+	// private String szImei = null; // 手机的IMEI
+	//
+	// @Override
+	// protected void onCreate(Bundle savedInstanceState) {
+	// super.onCreate(savedInstanceState);
+	//
+	// setContentView(R.layout.activity_login);
+	//
+	// TelephonyManager TelephonyMgr = (TelephonyManager)
+	// getSystemService(TELEPHONY_SERVICE);
+	// szImei = TelephonyMgr.getDeviceId();
+	//
+	// usernameEdit = (EditText) this.findViewById(R.id.et_user);
+	// usernameEdit.setText(ApplicationEnvironment.getInstance()
+	// .getPreferences(this).getString(Constants.kUSERNAME, ""));
+	// usernameEdit.setSelection(usernameEdit.getText().toString().length());
+	// passwordEdit = (EditText) this.findViewById(R.id.et_pwd);
+	//
+	// btn_login = (Button) this.findViewById(R.id.btn_login);
+	// btn_login.setOnClickListener(this);
+	// btn_register = (Button) this.findViewById(R.id.btn_register);
+	// btn_register.setOnClickListener(this);
+	// }
+	//
+	// @Override
+	// public void onClick(View v) {
+	// switch (v.getId()) {
+	// case R.id.btn_login:
+	// if (checkValue()) {
+	// login();
+	// }
+	//
+	// break;
+	// case R.id.btn_register:
+	// Intent intent = new Intent(LoginActivity.this,
+	// RegisterActivity.class);
+	// startActivityForResult(intent, 0);
+	// break;
+	// default:
+	// break;
+	// }
+	//
+	// }
+	//
+	// private boolean checkValue() {
+	// if ("".equals(usernameEdit.getText().toString().trim())) {
+	// Toast.makeText(this, "请输入账号", Toast.LENGTH_SHORT).show();
+	// return false;
+	// } else if ("".equals(passwordEdit.getText().toString().trim())) {
+	// Toast.makeText(this, "请输入密码", Toast.LENGTH_SHORT).show();
+	// return false;
+	// }
+	//
+	// return true;
+	// }
+	//
+	// // 登录
+	// private void login() {
+	//
+	// Editor editor = ApplicationEnvironment.getInstance().getPreferences()
+	// .edit();
+	// editor.putString(Constants.kUSERNAME, usernameEdit.getText().toString()
+	// .trim());
+	// editor.putString(Constants.kPASSWORD, passwordEdit.getText().toString()
+	// .trim());
+	// editor.commit();
+	//
+	// HashMap<String, Object> tempMap = new HashMap<String, Object>();
+	// tempMap.put("username", usernameEdit.getText().toString().trim());
+	// tempMap.put("password", passwordEdit.getText().toString().trim());
+	// tempMap.put("imei", szImei);
+	//
+	// LKHttpRequest req1 = new LKHttpRequest(TransferRequestTag.Login,
+	// tempMap, getLoginHandler());
+	//
+	// new LKHttpRequestQueue().addHttpRequest(req1).executeQueue(
+	// "正在登录请稍候...", new LKHttpRequestQueueDone() {
+	// @Override
+	// public void onComplete() {
+	// super.onComplete();
+	// passwordEdit.setText("");
+	// }
+	// });
+	// }
+	//
+	// private LKAsyncHttpResponseHandler getLoginHandler() {
+	// return new LKAsyncHttpResponseHandler() {
+	//
+	// @Override
+	// public void successAction(Object obj) {
+	// HashMap<String, String> map = (HashMap<String, String>) obj;
+	//
+	// String rt = map.get("ret");
+	// if (rt.equals("0")) { // 登录成功
+	// getAccounts();
+	//
+	// String url = map.get("url");
+	// String version = map.get("version");
+	// LoginActivity.this
+	// .hideDialog(BaseActivity.ADPROGRESS_DIALOG);
+	//
+	// if (ApplicationEnvironment.getInstance().getPreferences()
+	// .getInt(Constants.kVERSION, 0) == Integer
+	// .parseInt(version)
+	// && ActivityUtil.isAvilible(LoginActivity.this,
+	// Constants.SOTPPACKET)) {
+	// Intent intent = new Intent(LoginActivity.this,
+	// LockScreenSettingActivity.class);
+	// LoginActivity.this.startActivity(intent);
+	//
+	// } else {
+	//
+	// downloadAPKURL = Constants.IP + url;
+	// Constants.URL = downloadAPKURL;
+	// new DownloadAPKTask().execute();
+	//
+	// Editor editor = ApplicationEnvironment.getInstance()
+	// .getPreferences().edit();
+	// editor.putInt(Constants.kVERSION,
+	// Integer.parseInt(version));
+	// editor.commit();
+	//
+	// Intent intent = new Intent(LoginActivity.this,
+	// LockScreenSettingActivity.class);
+	// LoginActivity.this.startActivity(intent);
+	// }
+	// Intent intent = new Intent(LoginActivity.this,
+	// LockScreenSettingActivity.class);
+	// LoginActivity.this.startActivity(intent);
+	// LoginActivity.this.finish();
+	//
+	// } else if (rt.equals("1")) { // 参数不合法
+	// LoginActivity.this.showDialog(BaseActivity.MODAL_DIALOG,
+	// "参数不合法！");
+	// } else if (rt.equals("3")) {
+	// LoginActivity.this.showDialog(BaseActivity.MODAL_DIALOG,
+	// "用户名错误！");
+	// } else if (rt.equals("4")) {
+	// LoginActivity.this.showDialog(BaseActivity.MODAL_DIALOG,
+	// "密码错误！");
+	// } else if (rt.equals("5")) {
+	// LoginActivity.this.showDialog(BaseActivity.MODAL_DIALOG,
+	// "文件不存在！");
+	// } else {
+	// showToast("未知异常");
+	// }
+	// }
+	//
+	// };
+	// }
+	//
+	// private void getAccounts() {
+	// HashMap<String, Object> tempMap = new HashMap<String, Object>();
+	// tempMap.put("username", ApplicationEnvironment.getInstance()
+	// .getPreferences().getString(Constants.kUSERNAME, ""));
+	// tempMap.put("password", ApplicationEnvironment.getInstance()
+	// .getPreferences().getString(Constants.kPASSWORD, ""));
+	// tempMap.put("imei", szImei);
+	//
+	// LKHttpRequest req1 = new LKHttpRequest(
+	// TransferRequestTag.getAccountStr, tempMap, getAccountsHandler());
+	//
+	// new LKHttpRequestQueue().addHttpRequest(req1).executeQueue(null,
+	// new LKHttpRequestQueueDone() {
+	// @Override
+	// public void onComplete() {
+	// super.onComplete();
+	//
+	// }
+	// });
+	//
+	// }
+	//
+	// public LKAsyncHttpResponseHandler getAccountsHandler() {
+	//
+	// return new LKAsyncHttpResponseHandler() {
+	// @Override
+	// public void successAction(Object obj) {
+	// if (!ActivityUtil.isAvilible(BaseActivity.getTopActivity(),
+	// Constants.SOTPPACKET)) {
+	// //new DownloadAPKTask().execute();
+	// }
+	// Editor editor = ApplicationEnvironment.getInstance()
+	// .getPreferences().edit();
+	// editor.putString(Constants.kACCOUNTLIST, (String) obj);
+	// editor.commit();
+	// }
+	// };
+	//
+	// }
+	//
+	// public void onBackPressed() {
+	// super.onBackPressed();
+	//
+	// finish();
+	// }
+	//
+	// public class DownloadAPKTask extends AsyncTask<Object, Object, Object> {
+	//
+	// @Override
+	// protected Object doInBackground(Object... params) {
+	// download();
+	// return null;
+	// }
+	//
+	// }
+	//
+	// private void download() {
+	// Looper.prepare();
+	// DownloadFileRequest.sharedInstance().downloadAndOpen(this,
+	// downloadAPKURL, "download.apk");
+	// }
 
 }

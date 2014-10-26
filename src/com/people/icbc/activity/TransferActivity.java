@@ -13,6 +13,7 @@ import com.people.network.LKHttpRequestQueueDone;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -37,11 +38,11 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 		tv_receive = (TextView) findViewById(R.id.tv_receive);
 		tv_pay = (TextView) findViewById(R.id.tv_pay);
 		et_sum = (EditText) findViewById(R.id.et_sum);
-		et_sum = (EditText) findViewById(R.id.et_psw);
+		et_psw = (EditText) findViewById(R.id.et_psw);
 		btn_confirm = (Button) findViewById(R.id.btn_confirm);
 		btn_confirm.setOnClickListener(this);
-		tv_receive.setText(Constants.FACERECEIVE_CADE);
-		tv_pay.setText(Constants.FACEPAY_CARD);
+		tv_receive.setText("收款卡号：" + Constants.FACERECEIVE_CADE);
+		tv_pay.setText("付款卡号：" + Constants.FACEPAY_CARD);
 
 	}
 
@@ -82,6 +83,7 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 		tempMap.put("from", Constants.FACEPAY_CARD);
 		tempMap.put("to", Constants.FACERECEIVE_CADE);
 		tempMap.put("money", et_sum.getText().toString().trim());
+		Log.e("et_psw", et_psw.getText().toString().trim());
 		tempMap.put("psw", et_psw.getText().toString().trim());
 		LKHttpRequest req1 = new LKHttpRequest(TransferRequestTag.Transfer,
 				tempMap, TransferHandler());
@@ -93,6 +95,7 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 						super.onComplete();
 						BaseActivity.getTopActivity().hideDialog(
 								ADPROGRESS_DIALOG);
+						setResult(RESULT_OK);
 						finish();
 					}
 
@@ -109,7 +112,16 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 				String rt = map.get("ret");
 				switch (Integer.parseInt(rt)) {
 				case 0:
-
+					Intent intent0 = new Intent(TransferActivity.this,
+							SuccessActivity.class);
+					intent0.putExtra("FROM", "FACE");
+					intent0.putExtra("CARD", Constants.FACEPAY_CARD);
+					intent0.putExtra(
+							"SUM",
+							Integer.parseInt(Constants.FACE_SUM)
+									- Integer.parseInt(et_sum.getText()
+											.toString().trim()));
+					startActivity(intent0);
 					break;
 				case 17:
 					Intent intent1 = new Intent(TransferActivity.this,
@@ -138,4 +150,5 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 		};
 
 	}
+
 }
