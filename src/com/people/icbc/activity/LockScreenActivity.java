@@ -37,7 +37,7 @@ public class LockScreenActivity extends BaseActivity implements OnClickListener 
 				if (lpwv.verifyPassword(mPassword)) {
 					showToast("登陆成功！");
 					Intent intent = new Intent(LockScreenActivity.this,
-							MainActivity.class);
+							ICBCMainActivity.class);
 					// 打开新的Activity
 					startActivity(intent);
 					finish();

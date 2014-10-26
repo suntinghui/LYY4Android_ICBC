@@ -19,7 +19,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/appicon"
+        android:icon="@drawable/icon_old"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Light.NoTitleBar" >
         <activity android:name="com.people.icbc.activity.SplashActivity" >
@@ -103,6 +103,8 @@
         <activity android:name=".activity.HomepageActivity" >
         </activity>
         <activity android:name=".activity.ICBCMainActivity" >
+        </activity>
+        <activity android:name=".activity.TransferActivity" >
         </activity>
 
         <service

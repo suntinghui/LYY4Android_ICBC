@@ -45,4 +45,10 @@ public class Constants {
 	public static String resultCode;
 	public static String resultBalance;
 
+	public static String PSW_DIALOG;
+	public static String FACEPAY_CARD;
+	public static String FACERECEIVE_CADE;
+	public static String FACE_SUM;
+	public static String FACE_SUM2;
+
 }

@@ -30,6 +30,7 @@ public class OnlineShopActivity extends BaseActivity implements OnClickListener 
 		case R.id.btn_scan:
 			Intent intent = new Intent(OnlineShopActivity.this,
 					CaptureActivity.class);
+			intent.putExtra("test", "test");
 			startActivity(intent);
 			break;
 

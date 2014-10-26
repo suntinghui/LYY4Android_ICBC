@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.people.icbc.R;
+import com.people.icbc.client.Constants;
+import com.people.icbc.sqlite.DataDao;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -24,12 +26,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
 public class ICBCMainActivity extends BaseActivity implements OnClickListener {
+	private DataDao dao = null;
 	private Button btn_back_icbcmain = null;
 	private GridView main_gridView = null;
 	private int[] images = { R.drawable.icon_1, R.drawable.icon_2,
 			R.drawable.icon_3, R.drawable.icon_4, R.drawable.icon_5,
 			R.drawable.icon_6, R.drawable.icon_7 };
-	private String[] name = { "网上购物", "当面付", "在线消费", "离线消费", "扫描二维码消费", "添加新卡",
+	private String[] name = { "网上购物", "当面付", "在线消费", "离线消费", "ATM取款", "添加新卡",
 			"卸载SOTP插件" };
 	private List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
 	private myAdapter adapter = null;
@@ -40,10 +43,14 @@ public class ICBCMainActivity extends BaseActivity implements OnClickListener {
 		setContentView(R.layout.activity_icbcmain);
 
 		initView();
+		if (!dao.find(Constants.LOGGED)) {
+			dao.add(Constants.LOGGED, 1);
+		}
 
 	}
 
 	public void initView() {
+		dao = new DataDao(getApplication());
 		btn_back_icbcmain = (Button) findViewById(R.id.btn_back_icbcmain);
 		btn_back_icbcmain.setOnClickListener(this);
 		main_gridView = (GridView) findViewById(R.id.main_gridView);
@@ -81,10 +88,15 @@ public class ICBCMainActivity extends BaseActivity implements OnClickListener {
 							AccountsInfoActivity.class);
 					startActivity(intent3);
 				} else if (position == 4) {
-					Intent intent0 = new Intent(ICBCMainActivity.this,
-							OnlineShopActivity.class);
-					startActivity(intent0);
-				} else if (position == 5) {
+
+					// Intent intent4 = new Intent(ICBCMainActivity.this,
+					// OnlineShopActivity.class);
+					// startActivity(intent4);
+					showToast("ATM取款正在建设中");
+				}
+
+				else if (position == 5) {
+
 					Intent intent5 = new Intent(ICBCMainActivity.this,
 							BindActivity.class);
 					startActivity(intent5);

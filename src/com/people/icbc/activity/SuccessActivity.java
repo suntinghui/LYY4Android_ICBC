@@ -3,6 +3,7 @@ package com.people.icbc.activity;
 import com.people.icbc.client.Constants;
 import com.people.icbc.R;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -30,10 +31,15 @@ public class SuccessActivity extends BaseActivity {
 	}
 
 	public void setView() {
-
-		tv_cardcode.setText(Constants.resultCode);
-		tv_balance.setText(Constants.resultBalance);
-
+		Intent intent = getIntent();
+		if (intent.getStringExtra("FROM").equals("FACE")) {
+			tv_cardcode.setText(intent.getStringExtra("CARD"));
+			tv_balance.setText(intent.getIntExtra("SUM", 0) + "元");
+			Constants.FACE_SUM2 = intent.getIntExtra("SUM", 0) + "";
+		} else {
+			tv_cardcode.setText(Constants.resultCode);
+			tv_balance.setText(Constants.resultBalance);
+		}
 		btn_over.setOnClickListener(new OnClickListener() {
 
 			@Override

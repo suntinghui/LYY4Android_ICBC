@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -56,7 +57,7 @@ public class LockScreenSettingActivity extends BaseActivity {
 						showToast("密码修改成功,请记住密码.");
 						startActivity(new Intent(
 								LockScreenSettingActivity.this,
-								MainActivity.class));
+								ICBCMainActivity.class));
 						finish();
 					} else {
 						showToast("两次的密码不符请重新输入");
