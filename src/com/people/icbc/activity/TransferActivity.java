@@ -27,7 +27,6 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_transfer);
 		initView();
@@ -83,7 +82,6 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 		tempMap.put("from", Constants.FACEPAY_CARD);
 		tempMap.put("to", Constants.FACERECEIVE_CADE);
 		tempMap.put("money", et_sum.getText().toString().trim());
-		Log.e("et_psw", et_psw.getText().toString().trim());
 		tempMap.put("psw", et_psw.getText().toString().trim());
 		LKHttpRequest req1 = new LKHttpRequest(TransferRequestTag.Transfer,
 				tempMap, TransferHandler());
@@ -116,11 +114,17 @@ public class TransferActivity extends BaseActivity implements OnClickListener {
 							SuccessActivity.class);
 					intent0.putExtra("FROM", "FACE");
 					intent0.putExtra("CARD", Constants.FACEPAY_CARD);
+					// intent0.putExtra(
+					// "SUM",
+					// Integer.parseInt(Constants.FACE_SUM)
+					// - Integer.parseInt(et_sum.getText()
+					// .toString().trim()));
 					intent0.putExtra(
 							"SUM",
-							Integer.parseInt(Constants.FACE_SUM)
+							Integer.parseInt(Constants.FACE_SUM2)
 									- Integer.parseInt(et_sum.getText()
 											.toString().trim()));
+
 					startActivity(intent0);
 					break;
 				case 17:
