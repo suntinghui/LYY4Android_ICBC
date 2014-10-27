@@ -13,7 +13,6 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.people.icbc.activity.ConfirmOrderActivity.MyAdapter;
 import com.people.icbc.client.ApplicationEnvironment;
 import com.people.icbc.client.Constants;
 import com.people.icbc.client.ParseResponseXML;
@@ -25,29 +24,20 @@ import com.people.network.LKHttpRequest;
 import com.people.network.LKHttpRequestQueue;
 import com.people.network.LKHttpRequestQueueDone;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -73,16 +63,16 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 	private String cardCode;
 	private TextView tv_blanceChange;
 	private boolean firstClick = true;
+	public String s = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_facepay);
 
+		getAccounts();
 		initView();
-
-		initData();
-
+		// initData();
 	}
 
 	protected void onNewIntent(Intent i) {
@@ -96,7 +86,6 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 		} else {
 			try {
 				code = s[0];
-
 				iv_consume.setImageBitmap(createOneDCode(s[0]));
 				// tv_code.setText(code);
 				tv_code.setText(code.substring(0, 11) + "    "
@@ -156,7 +145,13 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 	}
 
 	public void initData() {
-
+		// s = ApplicationEnvironment.getInstance().getPreferences()
+		// .getString(Constants.FACE_SUM2, null);
+		// if (s != null) {
+		// tv_blanceChange.setText(s);
+		// tv_can_cost.setText(s + "元");
+		// tv_balance.setText(s + "元");
+		// } else {
 		String tempStr = ApplicationEnvironment.getInstance().getPreferences()
 				.getString(Constants.kACCOUNTLIST, "");
 		list_balance = ParseResponseXML.accounts(tempStr);
@@ -169,17 +164,29 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 		tv_balance.setText(total_cash + "元");
 	}
 
+	// }
+
 	public void resetData() {
 		String selectedAccountNo = list_balance.get(
 				((MyAdapter) lv_balance.getAdapter()).getSelectItem())
 				.getBalance();
+		// String tempStr =
+		// ApplicationEnvironment.getInstance().getPreferences()
+		// .getString(Constants.kUSERNAME, "")
+		// + ":"
+		// + selectedAccountNo
+		// + ":"
+		// + ApplicationEnvironment.getInstance().getPreferences()
+		// .getString(Constants.kPASSWORD, "");
 		String tempStr = ApplicationEnvironment.getInstance().getPreferences()
 				.getString(Constants.kUSERNAME, "")
 				+ ":"
 				+ selectedAccountNo
 				+ ":"
 				+ ApplicationEnvironment.getInstance().getPreferences()
-						.getString(Constants.kPASSWORD, "");
+						.getString(Constants.kPASSWORD, "")
+				+ ":"
+				+ Constants.IP.replace("http://", "");
 
 		Intent serviceIntent = new Intent("com.people.sotp.lyyservice");
 		serviceIntent.putExtra("SOTP", "genTOKEN");
@@ -430,8 +437,8 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 			holder.tv_cardcode.setText("(尾号)"
 					+ cardCode.substring(cardCode.length() - 6,
 							cardCode.length()));
-//			holder.tv_cardbalance.getPaint().setFlags(
-//					Paint.STRIKE_THRU_TEXT_FLAG);
+			// holder.tv_cardbalance.getPaint().setFlags(
+			// Paint.STRIKE_THRU_TEXT_FLAG);
 			if (firstClick) {
 				holder.tv_cardbalance.setText(list_balance.get(position)
 						.getCan_cost());
@@ -488,7 +495,56 @@ public class FacePayActivity extends BaseActivity implements OnClickListener {
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
+			// s = ApplicationEnvironment.getInstance().getPreferences()
+			// .getString(Constants.FACE_SUM2, null);
 			tv_blanceChange.setText(Constants.FACE_SUM2);
+			tv_can_cost.setText(Constants.FACE_SUM2 + "元");
+			tv_balance.setText(Constants.FACE_SUM2 + "元");
 		}
 	};
+
+	private void getAccounts() {
+		HashMap<String, Object> tempMap = new HashMap<String, Object>();
+		tempMap.put("username", ApplicationEnvironment.getInstance()
+				.getPreferences().getString(Constants.kUSERNAME, ""));
+		tempMap.put("password", ApplicationEnvironment.getInstance()
+				.getPreferences().getString(Constants.kPASSWORD, ""));
+
+		LKHttpRequest req1 = new LKHttpRequest(TransferRequestTag.Accounts,
+				tempMap, getAccountsHandler());
+
+		new LKHttpRequestQueue().addHttpRequest(req1).executeQueue(
+				"正在加载数据请稍候。。。", new LKHttpRequestQueueDone() {
+					@Override
+					public void onComplete() {
+						super.onComplete();
+						BaseActivity.getTopActivity().hideDialog(
+								ADPROGRESS_DIALOG);
+					}
+
+				});
+
+	}
+
+	public LKAsyncHttpResponseHandler getAccountsHandler() {
+
+		return new LKAsyncHttpResponseHandler() {
+			@Override
+			public void successAction(Object obj) {
+
+				list_balance = (List<AccountInfo>) obj;
+
+				adapter.notifyDataSetChanged();
+
+				for (int i = 0; i < list_balance.size(); i++) {
+					total_cash = Integer.parseInt(total_cash
+							+ list_balance.get(i).getCan_cost());
+				}
+				tv_balance.setText(total_cash + "元");
+
+			}
+		};
+
+	}
+
 }

@@ -34,8 +34,8 @@ public class SuccessActivity extends BaseActivity {
 		Intent intent = getIntent();
 		if (intent.getStringExtra("FROM").equals("FACE")) {
 			tv_cardcode.setText(intent.getStringExtra("CARD"));
-			tv_balance.setText(intent.getIntExtra("SUM", 0) + "元");
-			Constants.FACE_SUM2 = intent.getIntExtra("SUM", 0) + "";
+//			tv_balance.setText(intent.getIntExtra("SUM", 0) + "元");
+			tv_balance.setText(Constants.FACE_SUM2 + "元");
 		} else {
 			tv_cardcode.setText(Constants.resultCode);
 			tv_balance.setText(Constants.resultBalance);

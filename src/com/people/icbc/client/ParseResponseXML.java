@@ -21,7 +21,7 @@ public class ParseResponseXML {
 				return parseResponse(responseStr);
 
 			case TransferRequestTag.Login: // 登录
-				Log.e("responseStr",responseStr);
+				Log.e("responseStr", responseStr);
 				return parseResponse(responseStr);
 
 			case TransferRequestTag.Accounts: // 离线消费
@@ -40,13 +40,18 @@ public class ParseResponseXML {
 				return parseResponse(responseStr);
 
 			case TransferRequestTag.FacePayVerify: // 在线商城验证
-				Log.e("????", responseStr);
 				if (responseStr.contains("&")) {
 					Constants.FACERECEIVE_CADE = responseStr.split("&")[1];
 				}
 				return parseResponse(responseStr);
 
 			case TransferRequestTag.Transfer: // 当面付款方
+				// Editor editor = ApplicationEnvironment.getInstance()
+				// .getPreferences().edit();
+				// editor.putString(Constants.FACE_SUM2,
+				// responseStr.split("&")[1].split("=")[1]);
+				Constants.FACE_SUM2 = responseStr.split("&")[1].split("=")[1];
+				// editor.commit();
 				return parseResponse(responseStr);
 			}
 
@@ -78,7 +83,7 @@ public class ParseResponseXML {
 				.edit();
 		editor.putString(Constants.kACCOUNTLIST, str);
 		editor.commit();
-
+		Log.e("服务器返回值",str);
 		List<AccountInfo> accountList = new ArrayList<AccountInfo>();
 		try {
 			String[] sss = str.split("#");
