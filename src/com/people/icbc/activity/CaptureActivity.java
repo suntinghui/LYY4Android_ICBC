@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -42,14 +43,20 @@ import com.people.network.LKAsyncHttpResponseHandler;
 import com.people.network.LKHttpRequest;
 import com.people.network.LKHttpRequestQueue;
 import com.people.network.LKHttpRequestQueueDone;
+import com.people.icbc.client.LoyaltyCardReader; 
 
 /**
  * Initial the camera
  * 
  * @author Ryan.Tang
  */
-public class CaptureActivity extends BaseActivity implements Callback {
+public class CaptureActivity extends BaseActivity implements Callback, LoyaltyCardReader.AccountCallback {
 
+	private static final String TAG = "NFCAndTranActivity";
+	
+	private static int READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A
+			| NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK;
+	
 	private CaptureActivityHandler handler;
 	private ViewfinderView viewfinderView;
 	private boolean hasSurface;
@@ -66,6 +73,10 @@ public class CaptureActivity extends BaseActivity implements Callback {
 	private ProgressBar pg;
 	private ImageView iv_pg_bg_grey;
 
+	public LoyaltyCardReader mLoyaltyCardReader;
+	
+	private boolean isUploading = false;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,12 +90,20 @@ public class CaptureActivity extends BaseActivity implements Callback {
 		btn_back = (Button) this.findViewById(R.id.btn_back);
 		hasSurface = false;
 		inactivityTimer = new InactivityTimer(this);
+		
+		mLoyaltyCardReader = new LoyaltyCardReader(this);
+		// Disable Android Beam and register our card reader callback
+
+		enableReaderMode();
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		enableReaderMode();
+		
 		SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
 		SurfaceHolder surfaceHolder = surfaceView.getHolder();
 		if (hasSurface) {
@@ -134,6 +153,9 @@ public class CaptureActivity extends BaseActivity implements Callback {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		
+		disableReaderMode();
+		
 		if (handler != null) {
 			handler.quitSynchronously();
 			handler = null;
@@ -182,6 +204,8 @@ public class CaptureActivity extends BaseActivity implements Callback {
 	}
 
 	private void FacePayVerify() {
+		isUploading = true; 
+		
 		HashMap<String, Object> tempMap = new HashMap<String, Object>();
 		tempMap.put("token", Constants.resultString);
 
@@ -196,6 +220,7 @@ public class CaptureActivity extends BaseActivity implements Callback {
 						super.onComplete();
 						BaseActivity.getTopActivity().hideDialog(
 								ADPROGRESS_DIALOG);
+						isUploading = false;
 
 					}
 
@@ -383,5 +408,58 @@ public class CaptureActivity extends BaseActivity implements Callback {
 			setResult(RESULT_OK);
 			finish();
 		}
+	}
+	
+	private void enableReaderMode() {
+		Log.i(TAG, "Enabling reader mode");
+		NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
+		if (nfc != null) {
+			nfc.enableReaderMode(this, mLoyaltyCardReader, READER_FLAGS, null);
+		}
+	}
+
+	private void disableReaderMode() {
+		Log.i(TAG, "Disabling reader mode");
+		NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
+		if (nfc != null) {
+			nfc.disableReaderMode(this);
+		}
+	}
+
+	@Override
+	public void onAccountReceived(final String account) {
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (isUploading)
+					return;
+
+				inactivityTimer.onActivity();
+				playBeepSoundAndVibrate();
+				result0 = account;
+				// 判断是网上商城调用还是当面付调用
+				if (account.toString().contains("=")) {
+					Constants.resultString = account.split("=")[1];
+				} else {
+					Constants.resultString = account;
+				}
+				if (Constants.resultString.equals("")) {
+					Toast.makeText(CaptureActivity.this, "Scan failed!",
+							Toast.LENGTH_SHORT).show();
+				} else {
+					if (pg != null && pg.isShown()) {
+						pg.setVisibility(View.GONE);
+						iv_pg_bg_grey.setVisibility(View.VISIBLE);
+					}
+					Intent intent = getIntent();
+					String s = intent.getStringExtra("test");
+					if (s.equals("test")) {
+						Verify();
+					} else {
+						FacePayVerify();
+					}
+				}
+			}
+		});
 	};
 }

@@ -79,7 +79,7 @@ public class CardService extends HostApduService {
 		// If the APDU matches the SELECT AID command for this service,
 		// send the loyalty card account number, followed by a SELECT_OK status trailer (0x9000).
 		
-		if (!(BaseActivity.getTopActivity() instanceof AccountsInfoActivity) && !(BaseActivity.getTopActivity() instanceof OnlineAccountsInfoActivity)){
+		if (!(BaseActivity.getTopActivity() instanceof AccountsInfoActivity) && !(BaseActivity.getTopActivity() instanceof OnlineAccountsInfoActivity) &&  !(BaseActivity.getTopActivity() instanceof FacePayActivity)){
 			return UNKNOWN_CMD_SW;
 		}
 		
@@ -97,6 +97,14 @@ public class CardService extends HostApduService {
 		if (BaseActivity.getTopActivity() instanceof OnlineAccountsInfoActivity){
 			if (OnlineAccountsInfoActivity.isShow){
 				showTextStr = OnlineAccountsInfoActivity.code;
+			} else {
+				return UNKNOWN_CMD_SW;
+			}
+		}
+		
+		if (BaseActivity.getTopActivity() instanceof FacePayActivity){
+			if (FacePayActivity.isShow){
+				showTextStr = FacePayActivity.code;
 			} else {
 				return UNKNOWN_CMD_SW;
 			}

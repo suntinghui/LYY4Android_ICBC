@@ -485,5 +485,6 @@ public final class R {
     }
     public static final class xml {
         public static final int aid_list=0x7f050000;
+        public static final int nfc_tech_filter=0x7f050001;
     }
 }
